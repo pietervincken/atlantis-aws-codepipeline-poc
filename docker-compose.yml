@@ -1,0 +1,64 @@
+services:
+  atlantis:
+    image: ghcr.io/runatlantis/atlantis:v0.36.0
+    ports:
+      - "4141:4141"
+    environment:
+      # General Config
+      - ATLANTIS_REPO_ALLOWLIST="github.com/pietervincken/atlantis-tf-test" # Replace this with your own repo allowlist
+      - ATLANTIS_PORT=4141
+      - ATLANTIS_LOG_LEVEL=warn
+      
+      ## GitHub Config ###
+      - ATLANTIS_GH_USER=pietervincken # If you're using GitHub, replace with your Atlantis GitHub username (without @)
+      - ATLANTIS_GH_TOKEN=
+      - ATLANTIS_GH_WEBHOOK_SECRET=
+      ## End GitHub Config ###
+      
+      # ### GitLab Config ###
+      # - ATLANTIS_GITLAB_USER=<YOUR_GITLAB_USER> # If you're using GitLab, replace with your Atlantis GitLab username (without @)
+      # - ATLANTIS_GITLAB_TOKEN=${ATLANTIS_GITLAB_TOKEN}
+      # - ATLANTIS_GITLAB_WEBHOOK_SECRET=${ATLANTIS_GITLAB_WEBHOOK_SECRET}
+      # ### End GitLab Config ###
+      
+      # ### Gitea Config ###
+      # - ATLANTIS_GITEA_USER=<YOUR_GITEA_USER> # If you're using Gitea, replace with your Atlantis Gitea username (without @)
+      # - ATLANTIS_GITEA_TOKEN=${ATLANTIS_GITEA_TOKEN}
+      # - ATLANTIS_GITEA_WEBHOOK_SECRET=${ATLANTIS_GITEA_WEBHOOK_SECRET}
+      # ### End Gitea Config ###
+      
+      # ### Bitbucket Config ###
+      # - ATLANTIS_BITBUCKET_USER=<YOUR_BITBUCKET_USER> # If you're using Bitbucket, replace with your Atlantis Bitbucket username (without @)
+      # - ATLANTIS_BITBUCKET_TOKEN=${ATLANTIS_BITBUCKET_TOKEN}
+      # ### End Bitbucket Config ###
+      
+      # ### Azure DevOps Config ###
+      # - ATLANTIS_AZUREDEVOPS_USER=<YOUR_AZUREDEVOPS_USER> # If you're using Azure DevOps, replace with your Atlantis Azure DevOps username (without @)
+      # - ATLANTIS_AZUREDEVOPS_TOKEN=${ATLANTIS_AZUREDEVOPS_TOKEN}
+      # - ATLANTIS_AZUREDEVOPS_WEBHOOK_USER=${ATLANTIS_AZUREDEVOPS_WEBHOOK_USER}
+      # - ATLANTIS_AZUREDEVOPS_WEBHOOK_PASSWORD=${ATLANTIS_AZUREDEVOPS_WEBHOOK_PASSWORD}
+      # ### End Azure DevOps Config ###
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4141/healthz"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    
+    restart: unless-stopped
+  ghrunner:
+    image: pietervincken/ghrunner
+    environment:
+      - REPO_URL=https://github.com/pietervincken/atlantis-tf-test
+      - RUNNER_TOKEN=
+      - RUNNER_NAME=docker-compose-runner
